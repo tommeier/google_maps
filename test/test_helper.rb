@@ -20,9 +20,9 @@ require 'lib/google_map/small_icon'
 
 def marker_factory(options = {})
   params = {
-    :map => @map, 
-    :lat => 40, 
-    :lng => -100, 
+    :map => @map,
+    :lat => 40,
+    :lng => -100,
     :html => 'Test Marker'
   }.merge(options)
   GoogleMap::Marker.new(params)
@@ -30,10 +30,10 @@ end
 
 def polyline_factory(options = {})
   params = {
-    :map => @map, 
-    :color => "#00FF00", 
-    :weight => 10, 
-    :opacity => 2, 
+    :map => @map,
+    :color => "#00FF00",
+    :weight => 10,
+    :opacity => 2,
     :vertices => [
       GoogleMap::Point.new(40, -100),
       GoogleMap::Point.new(40, 100)]

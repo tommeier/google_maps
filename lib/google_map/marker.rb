@@ -13,22 +13,23 @@ module GoogleMap
                   :map,
                   :icon,
                   :open_infoWindow,
+                  :update_field,
                   :draggable,
                   :dragstart,
                   :dragend
 
     def initialize(options = {})
       options.each_pair { |key, value| send("#{key}=", value) }
-      
+
       if lat.blank? or lng.blank? or !map or !map.kind_of?(GoogleMap::Map)
         raise "Must set lat, lng, and map for GoogleMapMarker."
       end
-      
+
       if dom_id.blank?
         # This needs self to set the attr_accessor, why?
         self.dom_id = "#{map.dom_id}_marker_#{map.markers.size + 1}"
       end
-      
+
     end
 
     def open_info_window_function
@@ -53,14 +54,18 @@ module GoogleMap
       # If a icon is specified, use it in marker creation.
       i = ", { icon: #{icon.dom_id} #{h} }" if icon
       i = ", { icon: new GIcon( G_DEFAULT_ICON, '#{marker_icon_path}') #{h} }" if marker_icon_path
-		
+
       options = ', { draggable: true }' if self.draggable
       js << "#{dom_id} = new GMarker( new GLatLng( #{lat}, #{lng} ) #{i} #{options} );"
       js << "GEvent.bind(#{dom_id}, \"dragstart\", #{dom_id}, #{self.dragstart});" if dragstart
       js << "GEvent.bind(#{dom_id}, \"dragend\", #{dom_id}, #{self.dragend});" if dragend
-      
+
       if self.html
-        js << "GEvent.addListener(#{dom_id}, 'click', function() {#{dom_id}_infowindow_function()});"
+        js << "GEvent.addListener(#{dom_id}, 'click', function() {#{dom_id}_infowindow_function();});"
+      end
+      if self.update_field && self.update_field[:field].present? && self.update_field[:value].present?
+        #TODO : Make JS independent, not specific to JQuery
+        js << "GEvent.addListener(#{dom_id}, 'click', function() {$('##{self.update_field[:field]}').val('#{self.update_field[:value]}');});"
       end
 
       js << "#{map.dom_id}.addOverlay(#{dom_id});"
